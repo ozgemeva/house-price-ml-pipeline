@@ -53,26 +53,41 @@ class EDA:
            print("Approximately Symmetric:", skew_value)
             
         print("Skewness:", skew_value)
-           
-    def histogram(self,column_name):
+        
+    """     
+    def histogram(self,column_name,ax):
          # Histogram
         plt.figure()# create blank graph
         self.df[column_name].hist(bins=self.bins)#create 50 intervals
-        """
+       
+        ""
         1.bin 34.900-49.300
         2.bin 49.300 – 63.700
         50.bin -755.000
-        """
+        ""
         plt.title(f"{column_name} Distribution")
         plt.xlabel(column_name)
         plt.ylabel("Frequency")
         plt.grid(False)
         plt.show()
-
-
-         
+        """ 
         
-        
+    def histogram(self, column_name, ax):
+         ax.hist(self.df[column_name], bins=self.bins)
+         ax.set_title(f"{column_name} Distribution")
+         ax.set_xlabel(column_name)
+         ax.set_ylabel("Frequency")
+         ax.grid(False)
+    
+    def compare_columns(self, col1, col2):
+        fig, axes = plt.subplots(1, 2, figsize=(12,5))
+
+        self.histogram(col1, axes[0])
+        self.histogram(col2, axes[1])
+
+        plt.tight_layout()
+        plt.show()
+                
         
         
    

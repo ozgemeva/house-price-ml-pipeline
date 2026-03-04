@@ -1,5 +1,5 @@
 import numpy as np
-
+ 
 class FeatureEngineering:
     def __init__(self, df, target):
         self.df = df
@@ -12,3 +12,6 @@ class FeatureEngineering:
             self.df[new_column] = np.log1p(self.df[self.target])
 
         return self.df
+    
+   
+        

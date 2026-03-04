@@ -2,7 +2,7 @@ class Config:
     # Data
     DATA_PATH = "data/train.csv"
     
-    # Target
+    #Target
     TARGET = "SalePrice"
     
     # EDA

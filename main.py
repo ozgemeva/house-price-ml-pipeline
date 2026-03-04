@@ -1,28 +1,28 @@
 from src.data_loader import DataLoader
 from src.feature_engineering import FeatureEngineering as fen
 from src.config import Config
-from src.eda  import EDA
+from src.eda import EDA
 
 def main():
+    # Load data
     loader = DataLoader(Config.DATA_PATH)
-    df = loader.get_data() 
-  
-# EDA
-    eda = EDA(df, Config.TARGET,Config.BINS)
-    eda.target_analysis()
-    eda.check_skew()
-    eda.histogram(Config.TARGET) 
-     
-# Feature Engineering
+    df = loader.get_data()
+
+    # Initialize EDA
+    eda = EDA(df, Config.BINS)
+
+    # Check original skew
+    eda.check_skew(Config.TARGET)
+
+    # Feature Engineering
     fe = fen(df, Config.TARGET)
-    df = fe.log_transform_target() 
-    
-# Analisis after Transform
-    eda = EDA(df, f"{Config.TARGET}_log",Config.BINS)
-    eda.check_skew()
-    eda.histogram(f"{Config.TARGET}_log")
-    
+    log_col = fe.log_transform_target()
+
+    # Check skew after transformation
+    eda.check_skew(log_col)
+
+    # Compare distributions
+    eda.compare_columns(Config.TARGET, log_col)
+
 if __name__ == "__main__":
     main()
-    
-   
