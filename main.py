@@ -1,5 +1,5 @@
 from src.data_loader import DataLoader
-from src.feature_engineering import FeatureEngineering as fen
+from src.feature_engineering import FeatureEngineering 
 from src.config import Config
 from src.eda import EDA
 
@@ -9,13 +9,13 @@ def main():
     df = loader.get_data()
 
     # Initialize EDA
-    eda = EDA(df, Config.BINS)
+    eda = EDA(df, Config.TARGET, Config.BINS)
 
     # Check original skew
     eda.check_skew(Config.TARGET)
 
     # Feature Engineering
-    fe = fen(df, Config.TARGET)
+    fe = FeatureEngineering(df, Config.TARGET)
     log_col = fe.log_transform_target()
 
     # Check skew after transformation

@@ -41,9 +41,9 @@ class EDA:
         print("\nSalePrice Summary:")
         print(self.df[self.target].describe()) 
     
-    def check_skew(self):
+    def check_skew(self, column_name):
         
-        skew_value=self.df[self.target].skew()
+        skew_value=self.df[column_name].skew()
         
         if skew_value>1:
            print("Strong Right Skew:", skew_value)
@@ -52,7 +52,7 @@ class EDA:
         else:
            print("Approximately Symmetric:", skew_value)
             
-        print("Skewness:", skew_value)
+        print(f"{column_name} skew: {skew_value}")
         
     """     
     def histogram(self,column_name,ax):
