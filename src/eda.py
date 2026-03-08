@@ -46,13 +46,12 @@ class EDA:
         skew_value=self.df[column_name].skew()
         
         if skew_value>1:
-           print("Strong Right Skew:", skew_value)
+           print("Strong Right Skew:",skew_value)
         elif skew_value<-1:
-             print("Strong Left Skew:", skew_value)
+             print(f"Strong Left Skew:", skew_value)
         else:
            print("Approximately Symmetric:", skew_value)
             
-        print(f"{column_name} skew: {skew_value}")
         
     """     
     def histogram(self,column_name,ax):
@@ -87,7 +86,17 @@ class EDA:
 
         plt.tight_layout()
         plt.show()
-                
+    
+    def compare_columns_skew(self,col1,col2):
+       skew1 = int(self.check_skew(col1))
+       skew2 = int(self.check_skew(col2))       
+        
+       print(f"\nSkew of {col1}: {skew1:.2f}")
+       print(f"Skew of {col2}: {skew2:.2f}") 
+        
+      
+        
+ 
         
         
    
