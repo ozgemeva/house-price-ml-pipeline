@@ -10,8 +10,7 @@ class EDA:
         #to use shape function to learn "how many number of row and number of column (santiy check)"
         dfShape = self.df.shape
         print('\nShape:')
-        print(dfShape)
-        
+        print(dfShape)      
         
     def check_head(self):
         #to check data format and column name and available target data
@@ -29,12 +28,6 @@ class EDA:
         statisticColumn = self.df.describe(include=[np.number])
         print("\nNumerical Summary:")
         print(statisticColumn)
-    
-    def number_of_missing_data(self):
-        #to check how many missing data in column
-        numMissingData = self.df.isnull().sum()
-        print("\nNumber of Missing Data:")
-        print(numMissingData.sort_values(ascending=False))
         
     def target_analysis(self,column_name):
         #SalePrice is target value
@@ -46,18 +39,15 @@ class EDA:
         mean_value=self.df[column_name].mean()
         median_value=self.df[column_name].median()
         
-        
-        print(f"\nMean:  {mean_value:.0f}")
-        print(f"Mean:  {median_value:.0f}") 
-        
+        print(f"Mean: {mean_value:.0f}")
+        print(f"Median: {median_value:.0f}")
           
         if skew_value>1:
-           print(f"\nStrong Right Skew: {skew_value:.2f}")
+           print(f"\nInterpretation: Strong Right Skew: {skew_value:.2f}")
         elif skew_value<-1:
-             print(f"\nStrong Left Skew: {skew_value:.2f}")
+             print(f"\nInterpretation: Strong Left Skew: {skew_value:.2f}")
         else:
-           print(f"\nApproximately Symmetric: {skew_value:.2f}")
-            
+           print(f"\nInterpretation: Approximately Symmetric: {skew_value:.2f}")
         return skew_value
         
     """     
@@ -93,18 +83,21 @@ class EDA:
         self.histogram(col2, axes[1])
 
         plt.tight_layout()
-        plt.show()
+        plt.savefig("hist.png")
+        plt.close()
     
     def dataset_overview(self):
         self.sanity_check()
         self.check_head()
         self.check_data_info()
         self.check_describe()
-        self.number_of_missing_data()
         
-    def target_overview(self): 
-        self.target_analysis(self.target)
-        self.check_skew(self.target)
+    def target_overview(self,column_name): 
+        print("\n===== TARGET ANALYSIS =====")
+        #self.target_analysis(self.df[column_name])
+        self.check_skew(column_name)
+    
+
         
         
       
