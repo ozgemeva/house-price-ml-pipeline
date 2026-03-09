@@ -2,9 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class EDA:
-    def __init__(self,df,target,bins):
+    def __init__(self,df,bins):
         self.df = df
-        self.target = target
         self.bins = bins
          
     def sanity_check(self):
@@ -12,6 +11,7 @@ class EDA:
         dfShape = self.df.shape
         print('\nShape:')
         print(dfShape)
+        
         
     def check_head(self):
         #to check data format and column name and available target data
@@ -36,22 +36,29 @@ class EDA:
         print("\nNumber of Missing Data:")
         print(numMissingData.sort_values(ascending=False))
         
-    def target_analysis(self):
+    def target_analysis(self,column_name):
         #SalePrice is target value
-        print("\nSalePrice Summary:")
-        print(self.df[self.target].describe()) 
+        print(f"\n{column_name} Summary:")
+        print(self.df[column_name].describe()) 
     
-    def check_skew(self, column_name):
-        
+    def check_skew(self, column_name): 
         skew_value=self.df[column_name].skew()
+        mean_value=self.df[column_name].mean()
+        median_value=self.df[column_name].median()
         
+        
+        print(f"\nMean:  {mean_value:.0f}")
+        print(f"Mean:  {median_value:.0f}") 
+        
+          
         if skew_value>1:
-           print("Strong Right Skew:",skew_value)
+           print(f"\nStrong Right Skew: {skew_value:.2f}")
         elif skew_value<-1:
-             print(f"Strong Left Skew:", skew_value)
+             print(f"\nStrong Left Skew: {skew_value:.2f}")
         else:
-           print("Approximately Symmetric:", skew_value)
+           print(f"\nApproximately Symmetric: {skew_value:.2f}")
             
+        return skew_value
         
     """     
     def histogram(self,column_name,ax):
@@ -72,8 +79,9 @@ class EDA:
         """ 
         
     def histogram(self, column_name, ax):
+         skew = self.df[column_name].skew()
          ax.hist(self.df[column_name], bins=self.bins)
-         ax.set_title(f"{column_name} Distribution")
+         ax.set_title(f"{column_name} Distribution, (skew={skew:.2f})")
          ax.set_xlabel(column_name)
          ax.set_ylabel("Frequency")
          ax.grid(False)
@@ -87,12 +95,17 @@ class EDA:
         plt.tight_layout()
         plt.show()
     
-    def compare_columns_skew(self,col1,col2):
-       skew1 = int(self.check_skew(col1))
-       skew2 = int(self.check_skew(col2))       
+    def dataset_overview(self):
+        self.sanity_check()
+        self.check_head()
+        self.check_data_info()
+        self.check_describe()
+        self.number_of_missing_data()
         
-       print(f"\nSkew of {col1}: {skew1:.2f}")
-       print(f"Skew of {col2}: {skew2:.2f}") 
+    def target_overview(self): 
+        self.target_analysis(self.target)
+        self.check_skew(self.target)
+        
         
       
         
