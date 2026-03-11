@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt 
 import numpy as np
+import pandas as pd
 
 class EDA:
-    def __init__(self,df,bins):
+    def __init__(self,df: pd.DataFrame,bins):
         self.df = df
         self.bins = bins
          
@@ -17,11 +18,6 @@ class EDA:
         dfHead = self.df.head()
         print('\nHead:')
         print(dfHead)
-        
-    def check_data_info(self):
-        #to check missing data 
-        print("\nData Info:")
-        self.df.info()
         
     def check_describe(self):
         #to get statistic value from all cloumn , check Non-null count,numeric and categorical column
@@ -89,7 +85,6 @@ class EDA:
     def dataset_overview(self):
         self.sanity_check()
         self.check_head()
-        self.check_data_info()
         self.check_describe()
         
     def target_overview(self,column_name): 

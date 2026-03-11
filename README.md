@@ -9,7 +9,7 @@ This project implements an end-to-end machine learning workflow for house price 
 - Target skew analysis
 - Feature engineering (log transformation)
 - Config-driven pipeline structure
-- 
+
 The goal is to demonstrate clean project architecture and reproducible ML workflow design.
 
 ## Project Structure

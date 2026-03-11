@@ -1,6 +1,7 @@
+import pandas as pd
 class DATACLEANER:
     
-    def __init__(self,df):
+    def __init__(self,df: pd.DataFrame):
         self.df = df
          
     def number_of_missing_data(self):
@@ -48,6 +49,42 @@ class DATACLEANER:
         if duplicated_count == 0:
          print("Dataset is clean.")
             
+    def check_data_info(self):
+        #to check data type
+        print("\n=====  DATA TYPES =====")
+        info=self.df.info()
+        return info
+    
+    def find_dtype_colum(self):
+        #data_type = self.df.select_dtypes(include=dtype).columns        
+        cols = {
+            "categorical_cols": self.df.select_dtypes(include="object").columns,
+            "numerical_cols" : self.df.select_dtypes(include=["number"]).columns,
+            "boolean_cols" : self.df.select_dtypes(include="bool").columns,
+            "datetime_cols" : self.df.select_dtypes(include="datetime64").columns,
+        }
+            
+        #we clean the empty list
+        cols = { k:v for k , v in cols.items() if len (v) >0 }    
+        return cols
+    
+    def seperated_columns(self):
+        cols = self.find_dtype_colum()
+        categorical_cols = cols["categorical_cols"]
+        numerical_cols = cols["numerical_cols"]
+        return numerical_cols,categorical_cols
+    
+    #To include all same value of each data
+    def constant_data():
+        print()
+
     def data_clean(self):
         self.number_of_missing_data()
         self.duplicated_rows()
+        self.check_data_info()
+        self.find_dtype_colum()
+        self.seperated_columns()
+       
+        
+        
+        
