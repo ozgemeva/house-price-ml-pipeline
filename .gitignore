@@ -1,7 +1,20 @@
+# Python
 __pycache__/
 *.pyc
+
+# virtual env
 venv/
 .env
+
+# Jupyter
 .ipynb_checkpoints/
+
+# data
 data/
-.*.png
+
+# outputs / plots
+outputs/
+*.png
+*.jpg
+*.jpeg
+*.svg
