@@ -9,3 +9,4 @@ class Config:
     BINS = 50
     RUN_FULL_EDA = False
     
+    

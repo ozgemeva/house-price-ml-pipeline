@@ -21,6 +21,7 @@ house-price-ml-pipeline/
 │ ├── eda.py
 │ ├── feature_engineering.py
 │ ├── config_loader.py
+  ├── data_cleaner.py
 │
 ├── main.py
 ├── requirements.txt
@@ -34,11 +35,12 @@ Examples:
 - Model test size
 - Random seed
 
-## EDA & Target Analysis
+## EDA Approach
 - Target variable: `SalePrice`
-- Skewness evaluated before transformation
-- Log transformation applied to reduce right skew
-- Distribution comparison performed via side-by-side histograms
+- Checked missing values and categorized them by percentage
+- Detected duplicate rows and cleaned dataset
+- Applied log transformation to reduce right skewness
+- Compared original vs transformed target distribution
   
 ## Tech Stack
 - Python
