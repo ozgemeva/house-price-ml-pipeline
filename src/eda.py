@@ -17,7 +17,6 @@ class Eda:
         print("\nDescribe:")
         print(self.df.describe())
         
-    
     def number_of_missing_data(self):
         #to check how many missing data in column
         print("\n===== MISSING DATA ANALYSIS =====")
