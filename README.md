@@ -1,14 +1,22 @@
 # House Price ML Pipeline
-Production-style machine learning pipeline built from scratch using Python.
+A production-style machine learning pipeline built from scratch using Python, focused on understanding how data quality impacts model performance.
+
+## Project Motivation
+Most beginners focus on building models.
+In this project, I focused on something more important:
+Understanding how data, features, and targets shape model behavior.
+This project is not about achieving high accuracy.It is about building a solid foundation for reliable machine learning systems.
 
 ## Project Overview
 This project implements an end-to-end machine learning workflow for house price prediction, including:
 
-- Modular data loading
-- Exploratory data analysis (EDA)
-- Target skew analysis
-- Feature engineering (log transformation)
-- Config-driven pipeline structure
+- Data loading with modular structure
+- Exploratory Data Analysis (EDA)
+- Missing data analysis and cleaning
+- Duplicate detection and removal
+- Target distribution analysis
+- Log transformation to handle skewness
+- Config-driven pipeline design
 
 The goal is to demonstrate clean project architecture and reproducible ML workflow design.
 
@@ -28,12 +36,21 @@ house-price-ml-pipeline/
 └── .gitignore
 
 ## Configuration
-All configurable parameters are managed via centralized configuration to avoid hard-coded values.
-Examples:
+All parameters are centralized to ensure reproducibility:
+
 - Target variable
 - Histogram bins
-- Model test size
+- Train/test split
 - Random seed
+
+## Dataset
+This project uses the "House Prices - Advanced Regression Techniques" dataset from Kaggle:
+https://www.kaggle.com/datasets/rishitaverma02/house-prices-advanced-regression-techniques
+The dataset contains detailed information about residential homes and is commonly used for regression problems.
+
+## How to Run
+pip install -r requirements.txt
+python main.py
 
 ## EDA Approach
 - Target variable: `SalePrice`
