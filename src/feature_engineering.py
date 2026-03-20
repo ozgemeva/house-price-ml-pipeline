@@ -8,6 +8,6 @@ class FeatureEngineering:
     def log_transform_target(self):
         log_column_name = f"{self.target}_log"
         self.df[log_column_name] = np.log1p(self.df[self.target])
-        return log_column_name
+        return self.df,log_column_name
    
         

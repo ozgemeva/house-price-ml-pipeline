@@ -6,7 +6,8 @@ class Eda:
     def __init__(self,df: pd.DataFrame,bins):
         self.df = df
         self.bins = bins
-         
+      
+  # ---------------- CORE ----------------   
     def dataset_overview(self):
         print("\n===== DATASET OVERVIEW =====")
     
@@ -69,6 +70,17 @@ class Eda:
             print ("Dataset is clean.")
        
         return duplicate_count      
+
+    def get_columns_by_type(self):
+        #data_type = self.df.select_dtypes(include=dtype).columns.tolist()     
+        #tolist() = pandas obj conver to python list.
+       cols = {
+        "categorical": self.df.select_dtypes(include=["object", "category"]).columns.tolist(),
+        "numerical": self.df.select_dtypes(include=["number"]).columns.tolist(),
+        "boolean": self.df.select_dtypes(include="bool").columns.tolist(),
+        "datetime": self.df.select_dtypes(include=["datetime64[ns]"]).columns.tolist(),
+        }   
+       return cols
     
     def target_analysis(self,column_name):
         print(f"\n===== TARGET ANALYSIS: {column_name} =====")
@@ -140,14 +152,47 @@ class Eda:
             print(f"Saved to {save_path}")
         else:
              plt.show()
+             
+    #To include all same value of each data
+    def constant_data(self):   
+        constant_columns = [col for col in self.df.columns
+        if self.df[col].nunique(dropna=False) == 1] # include NaN 
+        #constant columns
+        return constant_columns
+    
+   # ---------------- GROUP ----------------
+    def run_general(self):
+        print("\n===== GENERAL EDA =====")
 
+        self.dataset_overview()
 
+        missing = self.number_of_missing_data()
+        dup = self.is_duplicated_row()
 
-        
-        
-      
-        
- 
+        return {
+        "missing": missing,
+        "duplicates": dup
+        }
+
+    def run_numerical(self, target=None): #Target= Opsiyonel
+        print("\n===== NUMERICAL EDA =====")
+        cols = self.get_columns_by_type()["numerical"]
+
+        for col in cols:
+            skew_info = self.check_skew(col)
+            print(f"{col} skew: {skew_info['skew']:.2f}")
+
+        if target:
+            print(f"\nTarget Analysis: {target}")
+            print(self.df[target].describe())       
+    
+    def run_categorical(self):
+            print("\n===== CATEGORICAL EDA =====")
+            cols = self.get_columns_by_type()["categorical"]
+            print("Categorical cols:", cols)
+
+            constants = self.constant_data()
+            print("Constant cols:", constants)
         
         
    
