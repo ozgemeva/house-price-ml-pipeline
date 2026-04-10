@@ -7,6 +7,8 @@ class Config:
     
     # EDA
     BINS = 50
-    RUN_FULL_EDA = False
+    
+    #DEBUG 
+    DEBUG = True
     
     

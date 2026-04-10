@@ -20,9 +20,9 @@ class Eda:
         
     def number_of_missing_data(self):
         #to check how many missing data in column
-        print("\n===== MISSING DATA ANALYSIS =====")
         missing_percent = self.df.isnull().mean() * 100
         missing_percent = missing_percent[missing_percent > 0].sort_values(ascending=False)
+       
         summary = {
             "low_missing" : [],
             "medium_missing" : [],
@@ -37,39 +37,30 @@ class Eda:
                 summary["medium_missing"].append((col, percent))
             else:
                 summary["high_missing"].append((col, percent))                 
-       
-         # print 
-        print("\nLOW (<5%)")
-        for col, p in summary["low_missing"]:
-            print(f"{col}: {p:.2f}%")
-
-        print("\nMEDIUM (5-20%)")
-        for col, p in summary["medium_missing"]:
-            print(f"{col}: {p:.2f}%")
-
-        print("\nHIGH (>20%)")
-        for col, p in summary["high_missing"]:
-         print(f"{col}: {p:.2f}%")
         
         return summary
+    
+    def analyze_high_missing(self,summary):
+        result ={}
+        for col, percent in summary["high_missing"]:
+         result[col] = {
+            "value_counts": self.df[col].value_counts(dropna=False),
+            "nan_count": self.df[col].isna().sum(),
+            "missing_percent": percent
+        }
+         return result
+
+            
         
     def is_duplicated_row(self):
-        print("\n===== DUPLICATE CHECK =====")
-        duplicate_count = self.df.duplicated().sum()
-        total_rows = self.df.shape[0]
-        duplicate_percent = (duplicate_count / total_rows) * 100
-        print(f"Total duplicate rows: {duplicate_count}")
-        print(f"Duplicate percentage: {duplicate_percent:.2f}%")
-        
-        if duplicate_count > 0:           
-        
-           print("\nSample duplicate rows:")
-           print(self.df[self.df.duplicated()].head())
-           
-        else:
-            print ("Dataset is clean.")
-       
-        return duplicate_count      
+          duplicate_count = self.df.duplicated().sum()
+          total_rows = self.df.shape[0]
+          duplicate_percent = (duplicate_count / total_rows) * 100
+
+          return {
+            "count": duplicate_count,
+            "percent": duplicate_percent
+          }   
 
     def get_columns_by_type(self):
         #data_type = self.df.select_dtypes(include=dtype).columns.tolist()     
@@ -93,40 +84,25 @@ class Eda:
     
     def check_skew(self, column_name): 
         data = self.df[column_name].dropna()
+        
         skew_value=data.skew()
         mean_value=data.mean()
         median_value=data.median()
+        interpretation = "symmetric"
         
         if skew_value>1:
-           print(f"\nInterpretation: Strong Right Skew: {skew_value:.2f}")
+           interpretation = "strong_right"
+    
         elif skew_value<-1:
-             print(f"\nInterpretation: Strong Left Skew: {skew_value:.2f}")
-        else:
-           print(f"\nInterpretation: Approximately Symmetric: {skew_value:.2f}")
-        
+           interpretation = "strong_left"
+                
         return {
+        "column": column_name,
         "skew": skew_value,
         "mean": mean_value,
-        "median": median_value
-         }
-        
-    """     
-    def histogram(self,column_name,ax):
-         # Histogram
-        plt.figure()# create blank graph
-        self.df[column_name].hist(bins=self.bins)#create 50 intervals
-       
-        ""
-        1.bin 34.900-49.300
-        2.bin 49.300 – 63.700
-        50.bin -755.000
-        ""
-        plt.title(f"{column_name} Distribution")
-        plt.xlabel(column_name)
-        plt.ylabel("Frequency")
-        plt.grid(False)
-        plt.show()
-        """ 
+        "median": median_value,
+        "interpretation": interpretation
+        }
         
     def histogram(self, column_name, ax):
          data = self.df[column_name].dropna()
@@ -160,12 +136,35 @@ class Eda:
         #constant columns
         return constant_columns
     
+    def detect_outliers_all(self):
+        results = {}
+        cols = self.get_columns_by_type()["numerical"]
+        total_rows = len(self.df)
+        
+        #IQR value = q3-q1 --> %75 - %25 = %50 
+        for col in cols:
+            Q1= self.df[col].quantile(0.25)
+            Q3 = self.df[col].quantile(0.75)
+            IQR =  Q3 - Q1 
+            upper_outlierBorder = Q3 + 1.5 * IQR
+            lower_outlierBorder = Q1 - 1.5 * IQR
+           
+            #col < lower   or   col > upper
+            outliers = self.df [ (self.df[col] < lower_outlierBorder) | (self.df[col] > upper_outlierBorder) ]
+            
+            count = len(outliers)
+            percent = (count / total_rows) * 100
+        
+        results[col] = {
+            "count": count,
+            "percent": percent,
+            "lower_bound": lower_outlierBorder,
+            "upper_bound": upper_outlierBorder
+             }
+                
    # ---------------- GROUP ----------------
     def run_general(self):
-        print("\n===== GENERAL EDA =====")
-
-        self.dataset_overview()
-
+        #self.dataset_overview()
         missing = self.number_of_missing_data()
         dup = self.is_duplicated_row()
 
@@ -173,19 +172,26 @@ class Eda:
         "missing": missing,
         "duplicates": dup
         }
-
+    
     def run_numerical(self, target=None): #Target= Opsiyonel
-        print("\n===== NUMERICAL EDA =====")
+        results = []
         cols = self.get_columns_by_type()["numerical"]
-
+        
         for col in cols:
             skew_info = self.check_skew(col)
-            print(f"{col} skew: {skew_info['skew']:.2f}")
+            results.append(skew_info)
+        
+        target_summary = None
 
         if target:
-            print(f"\nTarget Analysis: {target}")
-            print(self.df[target].describe())       
-    
+           target_summary = self.df[target].describe()
+        
+        return{
+            "skew_results": results,
+            "target_summary": target_summary
+        } 
+           
+
     def run_categorical(self):
             print("\n===== CATEGORICAL EDA =====")
             cols = self.get_columns_by_type()["categorical"]
