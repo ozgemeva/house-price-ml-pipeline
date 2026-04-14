@@ -9,14 +9,12 @@ class Eda:
       
   # ---------------- CORE ----------------   
     def dataset_overview(self):
-        print("\n===== DATASET OVERVIEW =====")
-    
-        print(f"Shape: {self.df.shape}")
-        print("\nHead:")
-        print(self.df.head())
-
-        print("\nDescribe:")
-        print(self.df.describe())
+       data_head = self.df.head()
+       data_shape = self.df.shape
+       data_describe = self.df.describe()
+       overview = {"head": data_head,"shape": data_shape,"describe": data_describe}
+        
+       return overview
         
     def number_of_missing_data(self):
         #to check how many missing data in column
@@ -36,21 +34,13 @@ class Eda:
             elif percent < 20:
                 summary["medium_missing"].append((col, percent))
             else:
-                summary["high_missing"].append((col, percent))                 
-        
+                summary["high_missing"].append((col, percent))      
+                
+        print(self.df.loc[self.df["LotFrontage"].isnull()].head(20))   
+        print("skew ",self.df["LotFrontage"].skew())   
+      
         return summary
-    
-    def analyze_high_missing(self,summary):
-        result ={}
-        for col, percent in summary["high_missing"]:
-         result[col] = {
-            "value_counts": self.df[col].value_counts(dropna=False),
-            "nan_count": self.df[col].isna().sum(),
-            "missing_percent": percent
-        }
-         return result
-
-            
+      
         
     def is_duplicated_row(self):
           duplicate_count = self.df.duplicated().sum()
@@ -90,10 +80,10 @@ class Eda:
         median_value=data.median()
         interpretation = "symmetric"
         
-        if skew_value>1:
+        if skew_value>1:#median
            interpretation = "strong_right"
     
-        elif skew_value<-1:
+        elif skew_value<-1:#mean
            interpretation = "strong_left"
                 
         return {
@@ -162,17 +152,6 @@ class Eda:
             "upper_bound": upper_outlierBorder
              }
                 
-   # ---------------- GROUP ----------------
-    def run_general(self):
-        #self.dataset_overview()
-        missing = self.number_of_missing_data()
-        dup = self.is_duplicated_row()
-
-        return {
-        "missing": missing,
-        "duplicates": dup
-        }
-    
     def run_numerical(self, target=None): #Target= Opsiyonel
         results = []
         cols = self.get_columns_by_type()["numerical"]
@@ -189,8 +168,7 @@ class Eda:
         return{
             "skew_results": results,
             "target_summary": target_summary
-        } 
-           
+        }           
 
     def run_categorical(self):
             print("\n===== CATEGORICAL EDA =====")

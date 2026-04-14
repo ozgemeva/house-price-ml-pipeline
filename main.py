@@ -4,72 +4,105 @@ from src.config import Config
 from src.eda import Eda
 from src.data_cleaner import DataCleaner
 
-def main():
-    DEBUG = Config.DEBUG
+
+def print_cleaning_summary(clean_result):
+    print("\n===== CLEANING SUMMARY =====")
+
+    filled = clean_result.get("filled", {}) or {}
+    dropped = clean_result.get("dropped", {}) or {}
+    summary = clean_result.get("summary", {}) or {}
+  
+    for col, method in filled.items():
+        print(f"{col} → {method}")
+
+    for col, method in dropped.items():
+        print(f"{col} → {method}")
     
-# ---------------- LOAD ----------------
+    print("\n===== HIGH MISSING =====")
+    for col, percent in summary.get("high_missing", []):
+        print(f"Feature name: {col}: percent: %{percent:.2f}")
+    
+    print("\n===== MEDIUM MISSING =====")
+    for col, percent in summary.get("medium_missing", []):
+        print(f"Feature name: {col}: percent: %{percent:.2f}")
+    
+    print("\n===== LOW MISSING =====")
+    for col, percent in summary.get("low_missing", []):
+        print(f"Feature name: {col}: percent: %{percent:.2f}")
+    
+    print("\nTotal filled:", len(filled))
+    print("Total dropped:", len(dropped))
+
+def debug_pipeline(original_df, df, eda_before, eda_after, log_col):
+    print("\n===== DATA SHAPE =====")
+    print("Before:", original_df.shape)
+    print("After:", df.shape)
+
+    print("\n===== TARGET CHECK =====")
+    print("Before skew:", original_df[Config.TARGET].skew())
+    print("After skew:", df[log_col].skew())
+
+    print("\n===== SKEW COMPARISON =====")
+
+    skew_before = {
+        r["column"]: r["skew"]
+        for r in eda_before.run_numerical(Config.TARGET)["skew_results"]
+    }
+
+    skew_after = {
+        r["column"]: r["skew"]
+        for r in eda_after.run_numerical(Config.TARGET)["skew_results"]
+    }
+
+    for col in skew_before:
+        if col == Config.TARGET:
+            print(f"{col} → before: {skew_before[col]:.2f}, after: {df[log_col].skew():.2f}")
+        elif col in skew_after:
+            print(f"{col} → before: {skew_before[col]:.2f}, after: {skew_after[col]:.2f}")
+            
+    
+
+
+def main(DEBUG=Config.DEBUG):
+
+    # LOAD
     loader = DataLoader(Config.DATA_PATH)
     df = loader.get_data()
+
     original_df = df.copy()
 
-   
-# ---------------- EDA (BEFORE CLEANING) ----------------
-    eda = Eda(df, Config.BINS)
-    general_info = eda.run_general()  # number_of_missing_data(),is_duplicated_row
-    dataType_info = eda.get_columns_by_type()
+    # EDA BEFORE
+    eda_before = Eda(original_df, Config.BINS)
+
+    # CLEANING INPUT
+    eda_current = Eda(df, Config.BINS)
     
-    missing_summary = general_info["missing"] #summary list output
-    duplicate_info = general_info["duplicates"] #duplicate_count output
+    data_Overview = eda_current.dataset_overview()
+    dataType_info = eda_current.get_columns_by_type()
+    missing_summary = eda_current.number_of_missing_data()
+    duplicate_info = eda_current.is_duplicated_row()
+    constant_cols = eda_current.constant_data()
     
- # ---------------- CLEANING ----------------
-    constant_cols = eda.constant_data()
+
+    # CLEANING
     cleaner = DataCleaner(df)
-    clean_result=cleaner.missing_data_fixed(missing_summary,dataType_info)
+    df, clean_result = cleaner.clean(missing_summary,dataType_info,duplicate_info["count"],constant_cols)
+    clean_result["summary"] = missing_summary
+    #clean_result["overview"] = data_Overview
+    print_cleaning_summary(clean_result)
     
-    cleaner.duplicated_rows(duplicate_info["count"])
-    cleaner.drop_constant_columns(constant_cols)
 
-    df = cleaner.df
-    
-    # ---------------- CLEANING OUTPUT ----------------
-    print("\n===== CLEANING SUMMARY =====") 
-    for col, method in clean_result["filled"].items():
-        print(f"{col} → {method}")
-    
-    for col, method in clean_result["dropped"].items():
-        print(f"{col} → {method}")
-        
-        
- # ---------------- EDA (AFTER CLEANING) ----------------
-    eda = Eda(df, Config.BINS)
-
-
- # ---------------- FEATURE ENGINEERING ----------------
+    # FEATURE ENGINEERING
     fe = FeatureEngineering(df, Config.TARGET)
-    df,log_col = fe.log_transform_target()
-    
+    df, log_col = fe.log_transform_target()
 
-# ---------------- VISUAL CHECK ----------------
-    eda.compare_columns(Config.TARGET, log_col)
+    # EDA AFTER
+    eda_after = Eda(df, Config.BINS)
 
-    
+    # DEBUG
     if DEBUG:
-        print("\n===== DATA SHAPE =====")
-        print("Before:", original_df.shape)
-        print("After:", df.shape)
+        debug_pipeline(original_df, df, eda_before, eda_after, log_col)
 
-        print("\n===== SKEW COMPARISON =====")
 
-        eda_before = Eda(original_df, Config.BINS)
-        eda_after = Eda(df, Config.BINS)
-
-        skew_before = {r["column"]: r["skew"] for r in eda_before.run_numerical(Config.TARGET)["skew_results"]}
-        skew_after = {r["column"]: r["skew"] for r in eda_after.run_numerical(Config.TARGET)["skew_results"]}
-
-        for col in skew_before:
-            if col in skew_after:
-                if abs(skew_before[col]) > 1 or abs(skew_after[col]) > 1:
-                    print(f"{col} → before: {skew_before[col]:.2f}, after: {skew_after[col]:.2f}")
-    
 if __name__ == "__main__":
     main()

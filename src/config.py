@@ -9,6 +9,6 @@ class Config:
     BINS = 50
     
     #DEBUG 
-    DEBUG = True
+    DEBUG = False
     
     
